@@ -4,20 +4,20 @@ import { generatePrivateKey, getPublicKey, nip19 } from "nostr-tools";
 import { useNDKStore } from "~/store/ndk-store";
 
 interface NostrKeyState {
-  privateKey: string | undefined;
-  publicKey: string | undefined;
-  nsec: string | undefined;
-  npub: string | undefined;
+  privateKey: string;
+  publicKey: string;
+  nsec: string;
+  npub: string;
   isKeyPairValid: boolean;
   generateKeyPair: () => void;
   setKeyPair: (privateKey: string) => void;
 }
 
 export const useKeyStore = create<NostrKeyState>()((set, get, store) => ({
-  privateKey: undefined,
-  publicKey: undefined,
-  nsec: undefined,
-  npub: undefined,
+  privateKey: "",
+  publicKey: "",
+  nsec: "",
+  npub: "",
   isKeyPairValid: false,
   generateKeyPair: () => {
     const privateKey = generatePrivateKey();
@@ -33,8 +33,6 @@ export const useKeyStore = create<NostrKeyState>()((set, get, store) => ({
       set({ privateKey, publicKey, nsec, npub, isKeyPairValid: true });
       useNDKStore.getState().init(privateKey);
     } else {
-      console.error("Invalid private key");
-      console.error("Invalid private key", store.getState());
       set({
         privateKey,
         publicKey: "...invalid private key",
@@ -42,7 +40,7 @@ export const useKeyStore = create<NostrKeyState>()((set, get, store) => ({
         npub: "",
         isKeyPairValid: false,
       });
-      useNDKStore.getState().disconnect();
+      useNDKStore.getState().initAnonymous();
     }
   },
 }));

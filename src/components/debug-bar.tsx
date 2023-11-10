@@ -5,16 +5,24 @@ import { useNDKStore } from "~/store/ndk-store";
 import { useEffect, useState } from "react";
 
 export const DebugBar = () => {
-  const { ndk } = useNDKStore();
+  const { ndk, initAnonymous } = useNDKStore();
   const [currentPublicKey, setCurrentPublicKey] =
     useState<string>("No pubkey / No ndk");
+
+  useEffect(() => {
+    initAnonymous();
+  }, []);
 
   useEffect(() => {
     const publicKeyFromNDK = ndk?.activeUser?.pubkey;
     if (publicKeyFromNDK) {
       setCurrentPublicKey(publicKeyFromNDK);
     } else {
-      setCurrentPublicKey("No pubkey / No ndk");
+      if (ndk) {
+        setCurrentPublicKey("connected to ndk without signer");
+      } else {
+        setCurrentPublicKey("No pubkey / No ndk");
+      }
     }
   }, [ndk]);
 
@@ -23,7 +31,7 @@ export const DebugBar = () => {
   };
 
   return (
-    <div className={"flex flex-row items-center justify-between p-4"}>
+    <div className={"flex flex-row items-center justify-between"}>
       <div>Connected with pubkey: {currentPublicKey}</div>
       <Button onClick={hello}>Seed Events</Button>
     </div>
